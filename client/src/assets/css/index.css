@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('../fonts/nunito/NunitoSans-Black.ttf') format('truetype');
+  font-weight: 900;
+}
+@font-face {
+  font-family: 'Uthmanic';
+  src: url('../fonts/Uthmanic.otf');
+}
+
+/* input webkit */
+@layer components {
+  .text-fill-white {
+    -webkit-text-fill-color: white !important;
+  }
+  .text-fill-black {
+    -webkit-text-fill-color: #6b7280 !important;
+  }
+}
+
+html {
+  font-family: 'Nunito Sans', 'sans-serif', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  @apply bg-seasalt text-richblack dark:bg-richblack dark:text-white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  @apply shadow-[0_0_0_30px_white_inset] dark:shadow-[0_0_0_30px_#374151_inset];
+}
+
+input:-webkit-autofill {
+  @apply dark:text-fill-white text-fill-black;
+}
+
+#template-dashboard {
+  grid-template-areas: 'aside header' 'aside main' 'aside footer';
+}
+
+aside {
+  grid-area: aside;
+}
+
+header {
+  grid-area: header;
+}
+
+main {
+  grid-area: main;
+}
+
+footer {
+  grid-area: footer;
+}
+
+/* react select */
+@layer components {
+  .my-react-select-container .my-react-select__control {
+    @apply dark:border-[#4B5563] dark:bg-charcoal;
+  }
+
+  .my-react-select-container .my-react-select__control--is-focused {
+    @apply border-primary shadow-none hover:border-primary;
+  }
+
+  .my-react-select-container .my-react-select__menu {
+    @apply dark:border-[#4B5563] dark:bg-charcoal;
+  }
+
+  .my-react-select-container .my-react-select__option {
+    @apply hover:bg-primary dark:bg-charcoal dark:text-neutral-200;
+  }
+
+  .my-react-select-container .my-react-select__option--is-focused {
+    @apply bg-primary text-white;
+  }
+  .my-react-select-container .my-react-select__option--is-selected {
+    @apply bg-primary;
+  }
+
+  .my-react-select-container .my-react-select__indicator-separator {
+    @apply dark:bg-neutral-400;
+  }
+
+  .my-react-select-container .my-react-select__placeholder {
+    @apply dark:text-[#C7C7CD];
+  }
+  .my-react-select-container .my-react-select__input-container,
+  .my-react-select-container .my-react-select__single-value {
+    @apply dark:text-white;
+  }
+}
