@@ -185,18 +185,34 @@ const Event = () => {
                 <td className="whitespace-nowrap px-6">{event.name}</td>
                 <td className="px-6">{event.description}</td>
                 <td className="whitespace-nowrap px-6 text-right">
-                  {event.status === 1 && (
+                  {event.status === 1 ? (
                     <>
                       <Button
                         label="Buat Buku Hadir"
-                        type="info"
-                        onClick={() => navigate(`/event/${event._id}/create-present`, {state: event})}
+                        type="success"
+                        outline
+                        onClick={() =>
+                          navigate(`/event/${event._id}/create-present`, { state: event })
+                        }
                       />
                       <span className="inline-block w-1"></span>
                       <Button
                         label="Tutup Absen"
-                        type="success"
+                        type="warning"
+                        outline
                         onClick={() => handleUpdateStatus(event)}
+                      />
+                      <span className="inline-block w-1"></span>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        label="Detail"
+                        type="success"
+                        outline
+                        onClick={() =>
+                          navigate(`/event/${event._id}/detail`, { state: event })
+                        }
                       />
                       <span className="inline-block w-1"></span>
                     </>
@@ -204,7 +220,7 @@ const Event = () => {
 
                   <Button
                     label="Ubah"
-                    type="warning"
+                    outline
                     onClick={() =>
                       navigate(`/event/${event._id}/update`, { state: event })
                     }
@@ -213,6 +229,7 @@ const Event = () => {
                   <Button
                     label="Hapus"
                     type="danger"
+                    outline
                     onClick={() => handleDelete(event)}
                   />
                 </td>

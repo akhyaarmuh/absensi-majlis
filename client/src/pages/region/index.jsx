@@ -146,7 +146,7 @@ const Region = () => {
                 <td className="whitespace-nowrap px-6 text-right">
                   <Button
                     label="Ubah"
-                    type="warning"
+                    outline
                     onClick={() =>
                       navigate(`/region/${region._id}/update`, { state: region })
                     }
@@ -155,6 +155,7 @@ const Region = () => {
                   <Button
                     label="Hapus"
                     type="danger"
+                    outline
                     onClick={() => handleDelete(region)}
                   />
                 </td>

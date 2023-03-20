@@ -3,7 +3,7 @@ import PresentBook from '../models/PresentBook.js';
 import { formatterErrorValidation } from '../utilities/mongoose.js';
 
 export const createPresent = async (req, res) => {
-  const url = `${req.protocol}://${req.get('host')}/images`
+  const url = `${req.protocol}://${req.get('host')}/images`;
   const { no_induk, event, type } = req.body;
   const key = type === 'kematian' ? 'absent_kematian' : 'absent_dzikiran';
 
@@ -41,10 +41,10 @@ export const createPresent = async (req, res) => {
         { $push: { attend_dzikiran: event } }
       ).exec();
     }
-    
-    member.set('image', url +'/'+ member.image)
 
-    res.status(201).json({ data:member });
+    member.set('image', member.image ? `${url}/${member.image}` : '');
+
+    res.status(201).json({ data: member });
   } catch (error) {
     if (error.name === 'ValidationError')
       res.status(400).json({

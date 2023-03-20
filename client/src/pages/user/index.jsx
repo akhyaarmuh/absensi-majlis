@@ -155,13 +155,14 @@ const User = () => {
                     <>
                       <Button
                         label="Perbarui status"
-                        type="success"
+                        outline
                         onClick={() => handleUpdateStatus(user)}
                       />
                       <span className="inline-block w-1"></span>
                       <Button
                         label="Hapus"
                         type="danger"
+                        outline
                         onClick={() => handleDelete(user)}
                       />
                     </>

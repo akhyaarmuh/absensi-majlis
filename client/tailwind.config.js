@@ -9,8 +9,9 @@ module.exports = {
         desktop: '1280px',
       },
       colors: {
-        primary: '#287bff',
-        // primary: '#2ec4b6',
+        primary: '#1db5ac', //tosca
+        // primary: '#287bff', //blue
+        // primary: '#2ec4b6', //green
         seasalt: '#f9fafb',
         frenchgray: '#d1d5db',
         stategray: '#6b7280',

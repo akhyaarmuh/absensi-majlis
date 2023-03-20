@@ -3,7 +3,8 @@ import jwt_decode from 'jwt-decode';
 import { refreshToken } from './auth';
 import { setExpiredToken } from '../features/user';
 
-axios.defaults.baseURL = 'http://localhost:5000/api/v1';
+// axios.defaults.baseURL = 'http://localhost:5000/api/v1';
+axios.defaults.baseURL = '/api/v1';
 axios.defaults.withCredentials = true;
 
 let store;

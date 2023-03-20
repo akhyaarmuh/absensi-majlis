@@ -23,12 +23,14 @@ export const createMember = async (req, res) => {
 };
 
 export const getAllMember = async (req, res) => {
-  const url = `${req.protocol}://${req.get('host')}/images`
+  const url = `${req.protocol}://${req.get('host')}/images`;
   const { page = 0, limit = 0, sort = '', ...query } = req.query;
   const queries = {};
   if (query.region) queries.region = query.region;
   if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
   if (query.no_induk) queries.no_induk = query.no_induk;
+  if (query.absent)
+    queries.$or = [{ absent_dzikiran: query.absent }, { absent_kematian: query.absent }];
 
   try {
     let data = await Member.find(queries).exec();
@@ -50,7 +52,7 @@ export const getAllMember = async (req, res) => {
 };
 
 export const getMemberById = async (req, res) => {
-  const url = `${req.protocol}://${req.get('host')}/images`
+  const url = `${req.protocol}://${req.get('host')}/images`;
   const { id: _id } = req.params;
 
   try {
@@ -59,8 +61,8 @@ export const getMemberById = async (req, res) => {
       .populate('region', 'name')
       .exec();
 
-    const member = data
-    member.url = url
+    const member = data;
+    member.url = url;
 
     res.json({ member });
   } catch (error) {

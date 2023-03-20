@@ -21,6 +21,7 @@ import presentBookRoute from './routes/presentBook.js';
 const app = express();
 const api = process.env.API_VERSION;
 const port = process.env.PORT || 5050;
+const devMode = process.env.DEV_MODE;
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'client', 'build')));
@@ -41,12 +42,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
 
-app.listen(process.env.PORT, () => {
-  console.log('Server running on: http://localhost:' + process.env.PORT);
-  open(`http://localhost:${process.env.PORT}`, { app: 'chrome' });
+app.listen(port, () => {
+  console.log('Server running on: http://localhost:' + port);
+  if (!devMode) open(`http://localhost:${port}`, { app: 'chrome' });
 });
 
-app.listen(process.env.PORT, ip.address(), () => {
-  console.log(`Server running on: http://${ip.address()}:${process.env.PORT}`);
+app.listen(port, ip.address(), () => {
+  console.log(`Server running on: http://${ip.address()}:${port}`);
   console.log('App started');
 });

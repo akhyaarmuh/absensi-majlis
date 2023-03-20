@@ -28,6 +28,10 @@ export const routes = [
         path: 'forgot-password',
         element: <ForgotPassword />,
       },
+      {
+        path: 'event/:id/pdf-preview',
+        element: <Event.PDFPreview />,
+      },
     ],
   },
   {
@@ -41,81 +45,86 @@ export const routes = [
       },
 
       {
-        path: '/region',
+        path: 'region',
         element: <Region.List />,
         auth: true,
       },
       {
-        path: '/region/create',
+        path: 'region/create',
         element: <Region.Form type="create" />,
         auth: true,
       },
       {
-        path: '/region/:id/update',
+        path: 'region/:id/update',
         element: <Region.Form type="update" />,
         auth: true,
       },
 
       {
-        path: '/member',
+        path: 'member',
         element: <Member.List />,
         auth: true,
       },
       {
-        path: '/member/create',
+        path: 'member/create',
         element: <Member.Form type="create" />,
         auth: true,
       },
       {
-        path: '/member/:id/update',
+        path: 'member/:id/update',
         element: <Member.Form type="update" />,
         auth: true,
       },
       {
-        path: '/member/:id/detail',
+        path: 'member/:id/detail',
         element: <Member.Detail />,
         auth: true,
       },
       {
-        path: '/member/:id/upload-image',
+        path: 'member/:id/upload-image',
         element: <Member.UploadImage />,
         auth: true,
       },
 
       {
-        path: '/event',
+        path: 'event',
         element: <Event.List />,
         auth: true,
       },
       {
-        path: '/event/create',
+        path: 'event/create',
         element: <Event.Form type="create" />,
         auth: true,
       },
       {
-        path: '/event/:id/update',
+        path: 'event/:id/update',
         element: <Event.Form type="update" />,
         auth: true,
       },
       {
-        path: '/event/:id/create-present',
+        path: 'event/:id/create-present',
         element: <Present.Create />,
+        auth: true,
+      },
+      {
+        path: 'event/:id/detail',
+        element: <Event.Detail />,
         auth: true,
       },
 
       {
-        path: '/user',
+        path: 'user',
         element: <User.List />,
         auth: true,
       },
 
       {
-        path: '/user-setting',
+        path: 'user-setting',
         element: <Setting.User />,
         auth: true,
       },
       {
-        path: '/restore',
+        path: 'restore',
         element: <Setting.Restore />,
         auth: true,
       },

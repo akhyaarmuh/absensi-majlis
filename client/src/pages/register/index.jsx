@@ -58,12 +58,12 @@ const Register = () => {
     <section id="register-page" className="bg-seasalt dark:bg-richblack">
       <div className="mx-auto grid min-h-screen max-w-7xl py-8 px-4 laptop:grid-cols-2 laptop:gap-20">
         <div className="mx-auto w-full place-self-center rounded-lg bg-white p-6 text-black shadow dark:bg-gunmetal dark:text-white tablet:max-w-xl tablet:p-8">
-          <a href="/#" className="mb-4 inline-flex items-center text-xl font-semibold">
-            NW Dev
-          </a>
-          <h1 className="mb-2 text-2xl font-bold">Buat akun anda</h1>
+          <h1 className="mb-4 inline-flex items-center text-right font-['Uthmanic'] text-2xl">
+            المصطفى الأمين
+          </h1>
+          <h2 className="mb-2 text-2xl font-bold">Buat akun anda</h2>
           <p className="text-sm font-light text-stategray dark:text-frenchgray">
-            Mulai situs web Anda dalam hitungan detik. Sudah memiliki akun?{' '}
+            Kelola absensi anda dengan mudah. Sudah memiliki akun?{' '}
             <Link to="/login" className="font-medium text-primary hover:underline">
               Masuk disini
             </Link>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { parseDate } from '../../utilities';
-import dummyProfile from '../../assets/images/profile.png';
+import dummyProfile from '../../assets/images/profile.jpg';
 import { Button, Breadcrumbs, Badges } from '../../components';
 import { updateStatusById, resetAbsentById } from '../../fetchers/member';
 

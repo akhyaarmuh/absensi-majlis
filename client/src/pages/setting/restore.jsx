@@ -55,7 +55,7 @@ const Restore = () => {
           disabled={uploading}
         />
 
-        <Button label="Upload File" block disabled={uploading} />
+        <Button label="Upload File" block disabled={uploading} size="md" />
       </form>
     </>
   );

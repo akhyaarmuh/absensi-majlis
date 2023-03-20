@@ -1,4 +1,6 @@
-import List from './index.jsx';
+import Detail from './detail';
 import Form from './form';
+import List from './index.jsx';
+import PDFPreview from './pdf-preview';
 
-export { List, Form };
+export { Detail, Form, List, PDFPreview };

@@ -42,12 +42,12 @@ const Login = () => {
     <section id="login-page" className="bg-seasalt dark:bg-richblack">
       <div className="mx-auto grid min-h-screen max-w-7xl py-8 px-4 laptop:grid-cols-2 laptop:gap-20">
         <div className="mx-auto w-full place-self-center rounded-lg bg-white p-6 text-black shadow dark:bg-gunmetal dark:text-white tablet:max-w-xl tablet:p-8">
-          <a href="/#" className="mb-4 inline-flex items-center text-xl font-semibold">
-            NW Dev
-          </a>
-          <h1 className="mb-2 text-2xl font-bold">Selamat datang kembali</h1>
+          <h1 className="mb-4 inline-flex items-center text-right font-['Uthmanic'] text-2xl">
+            المصطفى الأمين
+          </h1>
+          <h2 className="mb-2 text-2xl font-bold">Selamat datang kembali</h2>
           <p className="text-sm font-light text-stategray dark:text-frenchgray">
-            Mulai situs web Anda dalam hitungan detik. Belum memiliki akun?{' '}
+            Kelola absensi anda dengan mudah. Belum memiliki akun?{' '}
             <Link to="/register" className="font-medium text-primary hover:underline">
               Daftar disini
             </Link>
