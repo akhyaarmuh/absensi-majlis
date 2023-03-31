@@ -5,11 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index",
     "dev": "nodemon .",
-    "client": "cd client/ && npm start",
-    "re-install": "npm run delete-modules && npm install && cd client/ && npm install",
+    "start": "node index",
     "build": "cd client/ && npm run build",
+    "re-install": "npm run delete-modules && npm install && cd client/ && npm install",
     "delete-modules": "rmdir /s /q node_modules && cd client/ && rmdir /s /q node_modules"
   },
   "author": "Muhammad Akhyar",

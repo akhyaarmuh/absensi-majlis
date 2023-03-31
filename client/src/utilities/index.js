@@ -51,3 +51,7 @@ export const parseDate = (waktu) => {
     secondWithZero,
   };
 };
+
+export const toRupiah = (number) => {
+  return number.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1.')
+}

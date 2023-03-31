@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
+import { toRupiah } from '../../utilities';
 import { Breadcrumbs, Button, Badges } from '../../components';
 import { getAllMember, deleteMemberById } from '../../fetchers/member';
 
@@ -218,12 +219,12 @@ const Member = () => {
       </div>
 
       {/* pagination */}
-      <p>Total data: {member.rows}</p>
+      <p>Total data: {toRupiah(member.rows)}</p>
 
       {member.rows > 0 && (
         <>
           <p>
-            Halaman : {member.page + 1} dari {member.allPage} halaman.
+            Halaman: {toRupiah(member.page + 1)} dari {toRupiah(member.allPage)} halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">

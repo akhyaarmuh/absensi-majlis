@@ -44,10 +44,10 @@ app.get('*', (req, res) => {
 
 app.listen(port, () => {
   console.log('Server running on: http://localhost:' + port);
-  if (!devMode) open(`http://localhost:${port}`, { app: 'chrome' });
 });
 
 app.listen(port, ip.address(), () => {
   console.log(`Server running on: http://${ip.address()}:${port}`);
+  if (!devMode) open(`http://${ip.address()}:${port}`, { app: 'chrome' });
   console.log('App started');
 });

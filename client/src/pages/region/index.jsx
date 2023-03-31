@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
-import { Breadcrumbs, Button } from '../../components';
-
+import { toRupiah } from '../../utilities';
 import { deleteRegion } from '../../features/region';
-
+import { Breadcrumbs, Button } from '../../components';
 import { getAllRegion, deleteRegionById } from '../../fetchers/region';
 
 const breadList = [{ title: 'Beranda', href: '/' }, { title: 'Wilayah' }];
@@ -166,12 +165,12 @@ const Region = () => {
       </div>
 
       {/* pagination */}
-      <p>Total data: {region.rows}</p>
+      <p>Total data: {toRupiah(region.rows)}</p>
 
       {region.rows > 0 && (
         <>
           <p>
-            Halaman : {region.page + 1} dari {region.allPage} halaman.
+            Halaman: {toRupiah(region.page + 1)} dari {toRupiah(region.allPage)} halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">

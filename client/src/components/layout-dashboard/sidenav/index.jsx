@@ -19,12 +19,12 @@ const dataSidenav = [
     icon: <FaMosque />,
     page: '',
   },
-  
+
   {
     type: 'title',
     title: 'Data Master',
   },
-  
+
   {
     type: 'navigation',
     title: 'Wilayah',
@@ -93,7 +93,7 @@ const Sidenav = () => {
           {/* <img src={img_src} alt="logo" className="w-full" /> */}
         </span>
         <h1 className="flex-1 whitespace-nowrap pl-[10px] font-['Uthmanic'] text-3xl">
-          المصطفى الأمين
+          {process.env.REACT_APP_NAME}
         </h1>
         <button
           className="mr-[20px] text-2xl font-bold tablet:mr-4 laptop:hidden"

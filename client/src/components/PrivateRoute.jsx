@@ -24,15 +24,16 @@ const PrivateRoute = ({ children }) => {
     const checkAuth = async () => {
       if (!user) {
         try {
-          const accessToken = await refreshToken();
-          const decoded = jwt_decode(accessToken);
-          axiosWT.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-          const { data } = await getAllRegion({ sort: 'name' });
-          dispatch(setRegion(data.map((reg) => ({ value: reg._id, label: reg.name }))));
           if (window.innerWidth >= 1024) {
-            dispatch(toggleSidenav());
+            dispatch(toggleSidenav(true));
           }
-          dispatch(login(decoded));
+            const accessToken = await refreshToken();
+            const decoded = jwt_decode(accessToken);
+            axiosWT.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            const { data } = await getAllRegion({ sort: 'name' });
+            dispatch(setRegion(data.map((reg) => ({ value: reg._id, label: reg.name }))));
+            dispatch(login(decoded));
+            // dispatch(login({full_name: 'Muhammad Akhyar'}));
         } catch (error) {
           console.log(error);
           navigate('/login', { replace: true, state: { form: location } });

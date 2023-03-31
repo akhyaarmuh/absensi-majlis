@@ -2,8 +2,8 @@ import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
+import { toRupiah } from '../../utilities';
 import { Breadcrumbs, Button } from '../../components';
-
 import { getAllUser, deleteUserById, updateStatusById } from '../../fetchers/user';
 
 const breadList = [{ title: 'Beranda', href: '/' }, { title: 'Pengguna' }];
@@ -148,7 +148,13 @@ const User = () => {
                 <td className="whitespace-nowrap px-6 py-3 text-center">
                   {queries.page * queries.limit + (i + 1)}
                 </td>
-                <td className="whitespace-nowrap px-6">{user.full_name}</td>
+                <td
+                  className={`whitespace-nowrap px-6${
+                    user.status ? '' : ' text-red-500'
+                  }`}
+                >
+                  {user.full_name}
+                </td>
                 <td className="whitespace-nowrap px-6">{user.email}</td>
                 <td className="whitespace-nowrap px-6 text-right">
                   {user.role !== 'admin' && (
@@ -175,12 +181,12 @@ const User = () => {
       </div>
 
       {/* pagination */}
-      <p>Total data: {user.rows}</p>
+      <p>Total data: {toRupiah(user.rows)}</p>
 
       {user.rows > 0 && (
         <>
           <p>
-            Halaman : {user.page + 1} dari {user.allPage} halaman.
+            Halaman: {toRupiah(user.page + 1)} dari {toRupiah(user.allPage)} halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">

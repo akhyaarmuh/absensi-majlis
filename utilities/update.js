@@ -1,7 +1,6 @@
 import readline from 'readline/promises';
 import { spawn, execSync } from 'child_process';
 import { stdin as input, stdout as output } from 'process';
-import { __dirname } from './index.js';
 
 const rl = readline.createInterface({ input, output });
 const spawnPromise = async (command, options = []) => {

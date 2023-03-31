@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
-import { parseDate } from '../../utilities';
+import { parseDate, toRupiah } from '../../utilities';
 import { Breadcrumbs, Button } from '../../components';
 
 import { getAllEvent, deleteEventById, updateStatusById } from '../../fetchers/event';
@@ -240,12 +240,12 @@ const Event = () => {
       </div>
 
       {/* pagination */}
-      <p>Total data: {event.rows}</p>
+      <p>Total data: {toRupiah(event.rows)}</p>
 
       {event.rows > 0 && (
         <>
           <p>
-            Halaman : {event.page + 1} dari {event.allPage} halaman.
+            Halaman: {toRupiah(event.page + 1)} dari {toRupiah(event.allPage)} halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">

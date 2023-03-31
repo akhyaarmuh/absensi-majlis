@@ -8,8 +8,8 @@ export const tailwindSlice = createSlice({
   name: 'tailwind',
   initialState,
   reducers: {
-    toggleSidenav: (state) => {
-      state.openSidenav = !state.openSidenav;
+    toggleSidenav: (state, action) => {
+      state.openSidenav = action.payload || !state.openSidenav;
     },
   },
 });

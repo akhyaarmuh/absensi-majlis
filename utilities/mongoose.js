@@ -1,10 +1,10 @@
 import fs from 'fs';
 import User from '../models/User.js';
+import Event from '../models/Event.js';
+import { __dirname } from './index.js';
 import Region from '../models/Region.js';
 import Member from '../models/Member.js';
-import Event from '../models/Event.js';
 import PresentBook from '../models/PresentBook.js';
-import { __dirname } from './index.js';
 
 export const formatterErrorValidation = (error) => {
   const errors = {};
@@ -54,7 +54,7 @@ export const backupDatabase = async () => {
     presents: newPresents,
   };
 
-  fs.writeFileSync('../majlis.json', JSON.stringify(majlis));
+  fs.writeFileSync(`${__dirname}/majlis.json`, JSON.stringify(majlis));
 };
 
 export const restoreDatabase = async () => {
