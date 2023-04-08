@@ -7,9 +7,8 @@
   "scripts": {
     "dev": "nodemon .",
     "start": "node index",
-    "build": "cd client/ && npm run build",
-    "re-install": "npm run delete-modules && npm install && cd client/ && npm install",
-    "delete-modules": "rmdir /s /q node_modules && cd client/ && rmdir /s /q node_modules"
+    "re-install": "npm run delete-modules && npm install",
+    "delete-modules": "rmdir /s /q node_modules"
   },
   "author": "Muhammad Akhyar",
   "license": "ISC",

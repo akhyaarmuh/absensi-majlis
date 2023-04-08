@@ -39,7 +39,6 @@ if (isUpdate === 'Y') {
     await spawnPromise('git', ['pull']);
     console.log('Silakan tunggu beberapa saat...');
     execSync('npm run re-install');
-    execSync('npm run build');
 
     console.log('\n***************');
     console.log('Update berhasil');
