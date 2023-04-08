@@ -48,6 +48,6 @@ app.listen(port, () => {
 
 app.listen(port, ip.address(), () => {
   console.log(`Server running on: http://${ip.address()}:${port}`);
-  if (!devMode) open(`http://${ip.address()}:${port}`, { app: 'chrome' });
+  if (!devMode) open(`http://localhost:${port}`, { app: 'chrome' });
   console.log('App started');
 });
