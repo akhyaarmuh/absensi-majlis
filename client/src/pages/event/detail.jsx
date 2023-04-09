@@ -7,6 +7,7 @@ import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
 import { getAllMember } from '../../fetchers/member';
 import { Breadcrumbs, Button } from '../../components';
+import { getAllPresentByEvent } from '../../fetchers/present-book';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
@@ -19,6 +20,7 @@ const Detail = () => {
   const navigate = useNavigate();
   const regions = useSelector((state) => state.region.data);
   const [getting, setGetting] = useState(true);
+  const [attends, setAttends] = useState(0);
   const [member, setMember] = useState({
     data: [],
     page: 0,
@@ -44,8 +46,10 @@ const Detail = () => {
     const getAll = async () => {
       setGetting(true);
       try {
-        const data = await getAllMember(queries);
-        setMember(data);
+        const absent = await getAllMember(queries);
+        const { rows } = await getAllPresentByEvent(queries.absent);
+        setMember(absent);
+        setAttends(rows);
       } catch (error) {
         console.log(error);
       }
@@ -155,6 +159,7 @@ const Detail = () => {
       </div>
 
       {/* pagination */}
+      <p>Total hadir: {attends}</p>
       <p>Total data: {member.rows}</p>
 
       {member.rows > 0 && (
