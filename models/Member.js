@@ -102,7 +102,7 @@ memberSchema.pre('deleteOne', async function (next) {
   }).exec();
 
   for (const present of presentDeleted) {
-    await mongoose.models.PresentBook.deletOne({ _id: present._id }).exec();
+    await mongoose.models.PresentBook.deleteOne({ _id: present._id }).exec();
   }
 
   const deletingMember = await mongoose.models.Member.findOne(this._conditions);
