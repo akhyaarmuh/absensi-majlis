@@ -79,7 +79,7 @@ const Create = () => {
         <div className="flex">
           <div className="flex flex-1 flex-col overflow-hidden rounded-lg bg-white shadow-lg dark:bg-neutral-700 tablet:max-w-2xl tablet:flex-row">
             <img
-              className="h-96 w-full self-center object-cover tablet:h-full tablet:w-48"
+              className="h-0 w-0 self-center object-cover tablet:h-full tablet:w-48"
               src={member.image ? `${member.image}` : dummyProfile}
               alt=""
             />
