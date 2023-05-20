@@ -4,7 +4,7 @@ import { verifyAccessToken } from '../middlewares/index.js';
 
 const route = express.Router();
 
-route.post('/', verifyAccessToken, createPresent);
+route.post('/', createPresent);
 route.get('/:event', verifyAccessToken, getPresentBookByEvent);
 
 export default route;
