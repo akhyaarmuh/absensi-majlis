@@ -3,6 +3,7 @@ import Barcode from 'react-barcode';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import errorSound from '../../assets/sound/error.mp3';
 import { parseDate } from '../../utilities';
 import { Breadcrumbs } from '../../components';
 import dummyProfile from '../../assets/images/profile.jpg';
@@ -43,6 +44,7 @@ const Create = () => {
         });
         setMember(member);
       } catch (error) {
+        playError();
         Swal.fire({
           icon: 'error',
           title: `${error.response?.data?.message || error.message}`,
@@ -53,6 +55,10 @@ const Create = () => {
 
       document.querySelector('input[name="noInduk"]').value = '';
     }
+  };
+
+  const playError = () => {
+    new Audio(errorSound).play();
   };
 
   return (

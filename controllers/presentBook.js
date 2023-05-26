@@ -6,10 +6,9 @@ export const createPresent = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/images`;
   const { no_induk, event, type } = req.body;
   const key = type === 'kematian' ? 'absent_kematian' : 'absent_dzikiran';
+  const member = await Member.findOne({ no_induk }).populate('region').exec();
 
   try {
-    const member = await Member.findOne({ no_induk }).populate('region').exec();
-
     if (!member) {
       throw {
         name: 'ValidationError',
@@ -47,10 +46,16 @@ export const createPresent = async (req, res) => {
     res.status(201).json({ data: member });
   } catch (error) {
     if (error.name === 'ValidationError')
-      res.status(400).json({
-        message: error.errors.member?.message || error.message || 'Data tidak benar',
-        error: formatterErrorValidation(error),
-      });
+      if (error.errors.member?.message === 'Anggota sudah berhasil absen')
+        res.status(400).json({
+          message: `"${member.full_name}" sudah berhasil absen`,
+          error: formatterErrorValidation(error),
+        });
+      else
+        res.status(400).json({
+          message: error.errors.member?.message || error.message || 'Data tidak benar',
+          error: formatterErrorValidation(error),
+        });
     else res.status(500).json({ message: error.message || 'Server error', error });
   }
 };
