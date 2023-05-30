@@ -15,7 +15,7 @@ import userRoute from './routes/user.js';
 import regionRoute from './routes/region.js';
 import memberRoute from './routes/member.js';
 import eventRoute from './routes/event.js';
-import presentBookRoute from './routes/attendanceBook.js';
+import attendanceBookRoute from './routes/attendanceBook.js';
 import databaseRoute from './routes/database.js';
 
 const app = express();
@@ -35,7 +35,7 @@ app.use(`/${api}/user`, userRoute);
 app.use(`/${api}/region`, regionRoute);
 app.use(`/${api}/member`, memberRoute);
 app.use(`/${api}/event`, eventRoute);
-app.use(`/${api}/present-book`, presentBookRoute);
+app.use(`/${api}/attendance-book`, attendanceBookRoute);
 app.use(`/${api}/database`, databaseRoute);
 
 app.get('*', (req, res) => {

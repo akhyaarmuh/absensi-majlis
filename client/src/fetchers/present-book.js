@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { axiosWT } from '.';
 
-const rootPath = '/present-book';
+const rootPath = '/attendance-book';
 
 export const createPresent = async (payload) => {
   const response = await axios.post(`${rootPath}`, payload);
