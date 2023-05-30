@@ -1,10 +1,10 @@
 import fs from 'fs';
-import User from '../models/User.js';
-import Event from '../models/Event.js';
 import { __dirname } from './index.js';
+import User from '../models/User.js';
 import Region from '../models/Region.js';
 import Member from '../models/Member.js';
-import PresentBook from '../models/PresentBook.js';
+import Event from '../models/Event.js';
+import Attendance_Book from '../models/Attendance_Book.js';
 
 export const formatterErrorValidation = (error) => {
   const errors = {};
@@ -22,13 +22,13 @@ export const backupDatabase = async () => {
   const regions = await Region.find().exec();
   const members = await Member.find().exec();
   const events = await Event.find().exec();
-  const presents = await PresentBook.find().exec();
+  const attendance_books = await Attendance_Book.find().exec();
 
   const newUsers = [];
   const newRegions = [];
   const newMembers = [];
   const newEvents = [];
-  const newPresents = [];
+  const newAttendanceBooks = [];
 
   for (const user of users) {
     newUsers.push(user);
@@ -42,23 +42,23 @@ export const backupDatabase = async () => {
   for (const event of events) {
     newEvents.push(event);
   }
-  for (const present of presents) {
-    newPresents.push(present);
+  for (const attendance of attendance_books) {
+    newAttendanceBooks.push(attendance);
   }
 
-  const majlis = {
+  const backup = {
     users: newUsers,
     regions: newRegions,
     members: newMembers,
     events: newEvents,
-    presents: newPresents,
+    attendance_books: newAttendanceBooks,
   };
 
-  fs.writeFileSync(`${__dirname}/majlis.json`, JSON.stringify(majlis));
+  fs.writeFileSync(`${__dirname}/backup.json`, JSON.stringify(backup));
 };
 
 export const restoreDatabase = async () => {
-  const rawdata = fs.readFileSync(`${__dirname}/majlis.json`);
+  const rawdata = fs.readFileSync(`${__dirname}/backup.json`);
   const database = JSON.parse(rawdata);
 
   for (const user of database.users) {
@@ -77,8 +77,8 @@ export const restoreDatabase = async () => {
     const doc = new Event(event);
     await doc.save({ validateBeforeSave: false });
   }
-  for (const present of database.presents) {
-    const doc = new PresentBook(present);
+  for (const attendance of database.attendance_books) {
+    const doc = new Attendance_Book(attendance);
     await doc.save({ validateBeforeSave: false });
   }
 };

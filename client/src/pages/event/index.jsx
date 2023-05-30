@@ -35,8 +35,7 @@ const Event = () => {
     type: '',
     created_at: '',
     page: 0,
-    limit: 20,
-    sort: '-created_at',
+    limit: 10,
   });
   const [getting, setGetting] = useState(true);
 
@@ -56,7 +55,7 @@ const Event = () => {
     getAll();
   }, [queries]);
 
-  const handleUpdateStatus = ({ _id: id, type }) => {
+  const handleUpdateStatus = ({ _id: id }) => {
     Swal.fire({
       title: `Apakah kegiatan ini sudah selesai?`,
       text: `Anda yakin, tindakan ini tidak bisa dikembalikan`,
@@ -71,10 +70,7 @@ const Event = () => {
       preConfirm: () => {
         return (async () => {
           try {
-            await updateStatusById(
-              id,
-              type === 'dzikiran' ? 'absent_dzikiran' : 'absent_kematian'
-            );
+            await updateStatusById(id);
           } catch (error) {
             Swal.showValidationMessage(error.response?.data?.message || error.message);
             console.log(error);
@@ -83,17 +79,8 @@ const Event = () => {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        setEvent({
-          ...event,
-          data: event.data.map((event) => {
-            if (event._id === id)
-              return {
-                ...event,
-                status: 0,
-              };
-            return event;
-          }),
-        });
+        setEvent({ ...event, data: [] });
+        setQueries({ ...queries, limit: queries.limit === 10 ? 5 : 10 });
 
         Swal.fire({
           icon: 'success',
@@ -203,6 +190,14 @@ const Event = () => {
                         onClick={() => handleUpdateStatus(event)}
                       />
                       <span className="inline-block w-1"></span>
+                      <Button
+                        label="Ubah"
+                        outline
+                        onClick={() =>
+                          navigate(`/event/${event._id}/update`, { state: event })
+                        }
+                      />
+                      <span className="inline-block w-1"></span>
                     </>
                   ) : (
                     <>
@@ -218,20 +213,18 @@ const Event = () => {
                     </>
                   )}
 
-                  <Button
-                    label="Ubah"
-                    outline
-                    onClick={() =>
-                      navigate(`/event/${event._id}/update`, { state: event })
-                    }
-                  />
-                  <span className="inline-block w-1"></span>
-                  <Button
-                    label="Hapus"
-                    type="danger"
-                    outline
-                    onClick={() => handleDelete(event)}
-                  />
+                  {event.type === 'dzikiran' && event.status === 0 ? (
+                    ''
+                  ) : (
+                    <>
+                      <Button
+                        label="Hapus"
+                        type="danger"
+                        outline
+                        onClick={() => handleDelete(event)}
+                      />
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

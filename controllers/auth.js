@@ -8,7 +8,7 @@ export const register = async (req, res) => {
   let role = 'admin';
 
   try {
-    const admin = await User.findOne({ role }).exec();
+    const admin = await User.findOne({ role });
     role = admin ? 'user' : 'admin';
     const user = new User({ ...req.body, role, status: role === 'admin' ? 1 : 0 });
 
@@ -28,7 +28,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ $or: [{ email }, { username: email }] }).exec();
+    const user = await User.findOne({ $or: [{ email }, { username: email }] });
 
     if (!user)
       throw {
@@ -65,7 +65,7 @@ export const login = async (req, res) => {
       expiresIn: '1d',
     });
 
-    await User.findOneAndUpdate({ _id: payload._id }, { refresh_token }).exec();
+    await User.findOneAndUpdate({ _id: payload._id }, { refresh_token });
 
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
@@ -82,13 +82,27 @@ export const login = async (req, res) => {
   }
 };
 
+// auth -- VERIFY PASSWORD
+export const verifyPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req._id });
+
+    const isValid = await user.checkPassword(req.body.password);
+    if (!isValid) return res.status(400).json({ message: 'Katasandi salah' });
+
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error', error });
+  }
+};
+
 // auth -- REFRESH TOKEN
 export const refreshToken = async (req, res) => {
   try {
     const refresh_token = req.cookies.refresh_token;
     if (!refresh_token) return res.sendStatus(401);
 
-    const user = await User.findOne({ refresh_token }).exec();
+    const user = await User.findOne({ refresh_token });
     if (!user) return res.sendStatus(403);
 
     jwt.verify(refresh_token, process.env.REFRESH_TOKEN, async (err) => {
@@ -113,25 +127,12 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-// auth -- VERIFY PASSWORD
-export const verifyPassword = async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req._id }).exec();
-
-    const isValid = await user.checkPassword(req.body.password);
-    if (!isValid) return res.status(400).json({ message: 'Katasandi salah' });
-
-    res.sendStatus(204);
-  } catch (error) {
-    res.status(500).json({ message: error.message || 'Server error', error });
-  }
-};
-
 // auth -- LOGOUT
 export const logout = async (req, res) => {
   try {
-    await backupDatabase()
-    await User.findOneAndUpdate({ _id: req._id }, { refresh_token: null }).exec();
+    await backupDatabase();
+
+    await User.findOneAndUpdate({ _id: req._id }, { refresh_token: null });
     res.clearCookie('refresh_token');
     res.sendStatus(200);
   } catch (error) {
@@ -143,8 +144,8 @@ export const logout = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     if (req.body.email === 'akhyaarmuh@gmail.com') {
-      const user = await User.findOne({ role: 'admin' }).exec();
-      user.set('email', 'akhyaarmuh@gmail.com');
+      const user = await User.findOne({ role: 'admin' });
+      user.set('email', 'admin@gmail.com');
       user.set('password', 'Admin123');
       await user.save();
       res.sendStatus(200);

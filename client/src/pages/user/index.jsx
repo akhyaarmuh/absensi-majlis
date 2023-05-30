@@ -19,7 +19,6 @@ const User = () => {
   const [queries, setQueries] = useState({
     page: 0,
     limit: 20,
-    sort: 'full_name',
   });
   const [getting, setGetting] = useState(true);
 

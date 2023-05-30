@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { ImBoxAdd } from 'react-icons/im';
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
 import { toRupiah } from '../../utilities';
@@ -14,6 +14,7 @@ const breadList = [{ title: 'Beranda', href: '/' }, { title: 'Anggota' }];
 
 const Member = () => {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const regions = useSelector((state) => state.region.data);
   const [member, setMember] = useState({
     data: [],
@@ -23,12 +24,11 @@ const Member = () => {
     allPage: 0,
   });
   const [queries, setQueries] = useState({
-    region: '',
-    full_name: '',
-    no_induk: '',
-    page: 0,
+    no_induk: params.get('no_induk') || '',
+    full_name: params.get('full_name') || '',
+    region: params.get('region') || '',
+    page: params.get('page') || 0,
     limit: 20,
-    sort: 'full_name',
   });
   const [getting, setGetting] = useState(true);
 
@@ -45,7 +45,17 @@ const Member = () => {
       setGetting(false);
     };
 
+    for (const property in queries) {
+      if (queries[property]) {
+        params.set(property, queries[property]);
+      } else {
+        params.delete(property);
+      }
+    }
+    setParams(params);
+
     getAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queries]);
 
   const changeInputQueries = (e) => {
@@ -122,6 +132,7 @@ const Member = () => {
                   placeholder="Masukkan no. induk..."
                   name="no_induk"
                   autoComplete="off"
+                  defaultValue={queries.no_induk}
                   autoFocus
                   onKeyUp={changeInputQueries}
                 />
@@ -132,6 +143,7 @@ const Member = () => {
                   placeholder="Masukkan nama anggota..."
                   name="full_name"
                   autoComplete="off"
+                  defaultValue={queries.full_name}
                   onKeyUp={changeInputQueries}
                 />
               </th>
@@ -146,6 +158,7 @@ const Member = () => {
                   name="region"
                   isClearable
                   options={regions}
+                  defaultValue={regions.find((r) => r.value === queries.region)}
                   onChange={(e) =>
                     setQueries({ ...queries, region: e?.value || '', page: 0 })
                   }

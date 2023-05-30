@@ -17,8 +17,8 @@ export const updateEventById = async (payload) => {
   return response.data;
 };
 
-export const updateStatusById = async (id, type) => {
-  const response = await axiosWT.patch(`${rootPath}/${id}/status`, { type });
+export const updateStatusById = async (id) => {
+  const response = await axiosWT.patch(`${rootPath}/${id}/status`);
   return response.data;
 };
 

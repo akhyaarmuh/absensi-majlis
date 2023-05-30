@@ -13,6 +13,7 @@ const userSchema = new Schema(
     },
     username: {
       type: String,
+      index: true,
       trim: true,
       minLength: [7, 'Terlalu pendek, setidaknya 7 karakter'],
       maxLength: [20, 'Panjang maksimal 20 karakter'],
@@ -34,6 +35,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, 'Email diperlukan'],
+      index: true,
       trim: true,
       lowercase: true,
       minLength: [6, 'Terlalu pendek, setidaknya 6 karakter'],

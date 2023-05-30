@@ -1,6 +1,6 @@
 import Event from '../models/Event.js';
 import Member from '../models/Member.js';
-import PresentBook from '../models/PresentBook.js';
+import Attendance_Book from '../models/Attendance_Book.js';
 import { formatterErrorValidation } from '../utilities/mongoose.js';
 
 export const createEvent = async (req, res) => {
@@ -22,28 +22,25 @@ export const createEvent = async (req, res) => {
 };
 
 export const getAllEvent = async (req, res) => {
-  const { page = 0, limit = 0, sort = '', ...query } = req.query;
+  const { page = 0, limit = 0, sort = '-created_at' } = req.query;
   const queries = {};
-  if (query.type) queries.type = query.type;
-  if (query.created_at) {
-    let tomorrow;
-    tomorrow = new Date(query.created_at);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    queries.created_at = { $gte: new Date(query.created_at), $lt: tomorrow };
-  }
 
   try {
-    let data = await Event.find(queries).exec();
+    const rows = await Event.countDocuments(queries);
+    const allPage = !rows ? 0 : !limit ? 1 : Math.ceil(rows / limit);
 
-    const rows = data.length;
-    const allPage = Math.ceil(rows ? rows / (limit || rows) : 0);
-
-    data = await Event.find(queries)
+    const data = await Event.find(queries)
+      .populate({
+        path: 'absent',
+        populate: { path: 'region' },
+        options: {
+          sort: { region: 'asc', full_name: 'asc' },
+        },
+      })
       .select('-__v')
       .sort(sort)
       .skip(page * limit)
-      .limit(limit || rows)
-      .exec();
+      .limit(limit || rows);
 
     res.json({ data, page: Number(page), limit: Number(limit), rows, allPage });
   } catch (error) {
@@ -55,7 +52,15 @@ export const getEventById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const data = await Event.findOne({ _id }).select('-__v').exec();
+    const data = await Event.findOne({ _id })
+      .populate({
+        path: 'absent',
+        populate: { path: 'region' },
+        options: {
+          sort: { region: 'asc', full_name: 'asc' },
+        },
+      })
+      .select('-__v');
 
     res.json({ data });
   } catch (error) {
@@ -74,7 +79,7 @@ export const updateEventById = async (req, res) => {
       {
         runValidators: true,
       }
-    ).exec();
+    );
 
     res.json({ data: payload });
   } catch (error) {
@@ -89,36 +94,86 @@ export const updateEventById = async (req, res) => {
 
 export const updateStatusById = async (req, res) => {
   const { id: _id } = req.params;
-  const { type } = req.body;
 
   try {
-    const event = await Event.findOneAndUpdate({ _id }, { status: 0 }).exec();
+    const event = await Event.findOneAndUpdate({ _id }, { status: 0 });
 
-    const attendMember = await PresentBook.find({ event: _id }).exec();
-    const members = [];
+    const attendanceMembers = await Attendance_Book.find({ event_id: _id });
 
-    for (const present of attendMember) {
-      members.push(present.member);
+    const attendance_ids = [];
+    for (const member of attendanceMembers) {
+      attendance_ids.push(member.member_id);
     }
 
-    if (event.type === 'dzikiran') {
-      await Member.updateMany(
-        { _id: { $nin: members } },
-        { $push: { [type]: _id } }
-      ).exec();
+    let absentMembers;
 
+    if (event.type === 'dzikiran') {
+      // masukan absen hadir ke member yang belum aktif atau absen kematian 3 kali
       await Member.updateMany(
         {
-          _id: { $nin: members },
-          $or: [{ $where: 'this.absent_kematian.length>2' }, { status: 0 }],
+          _id: { $in: attendance_ids },
+          $or: [{ status: 0 }, { $where: 'this.absent_kematian.length>2' }],
         },
-        { $set: { attend_dzikiran: [] } }
-      ).exec();
-    } else if (event.type === 'kematian') {
+        {
+          $push: {
+            attendance_dzikiran: {
+              event_id: _id,
+              name: event.name,
+              date: event.created_at,
+            },
+          },
+        }
+      );
+
+      // untuk yang tidak hadir dalam keadaan status belum aktif atau absen kematian lebih 3 kali maka reset attandance_dzikiran
       await Member.updateMany(
-        { _id: { $nin: members }, status: 1, $where: 'this.absent_kematian.length<3' },
-        { $push: { [type]: _id } }
-      ).exec();
+        {
+          _id: { $nin: attendance_ids },
+          $or: [{ status: 0 }, { $where: 'this.absent_kematian.length>2' }],
+        },
+        { $set: { attendance_dzikiran: [] } }
+      );
+
+      absentMembers = await Member.find({ _id: { $nin: attendance_ids } });
+    } else if (event.type === 'kematian') {
+      // ambil siapa saja yang tidak hadir
+      absentMembers = await Member.find({
+        _id: { $nin: attendance_ids },
+        status: 1,
+        $where: 'this.absent_kematian.length<3',
+      });
+
+      // masukan absen ke member yang aktif atau absen kematian dibawah 3 kali
+      await Member.updateMany(
+        {
+          _id: { $nin: attendance_ids },
+          status: 1,
+          $where: 'this.absent_kematian.length<3',
+        },
+        {
+          $push: {
+            absent_kematian: {
+              event_id: _id,
+              name: event.name,
+              date: event.created_at,
+            },
+          },
+        }
+      );
+    }
+
+    const absent_ids = [];
+    for (const member of absentMembers) {
+      absent_ids.push(member._id);
+    }
+
+    await Event.findOneAndUpdate(
+      { _id },
+      { attendance: attendance_ids.length, absent: absent_ids }
+    );
+
+    for (const attandance of attendanceMembers) {
+      await Attendance_Book.deleteOne({ _id: attandance._id });
     }
 
     res.sendStatus(204);
@@ -131,7 +186,7 @@ export const deleteEventById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    await Event.deleteOne({ _id }).exec();
+    await Event.deleteOne({ _id });
 
     res.sendStatus(204);
   } catch (error) {

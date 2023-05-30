@@ -113,7 +113,10 @@ const Form = (props) => {
                   value={typeEvent}
                   errorMessage={error[name]}
                   options={[
-                    { value: 'kematian', label: 'Kematian' },
+                    {
+                      value: 'kematian',
+                      label: 'Kematian (untuk tujuan percobaan gunakan pilihan ini)',
+                    },
                     { value: 'dzikiran', label: 'Dzikiran' },
                   ]}
                   onChange={(e) => {

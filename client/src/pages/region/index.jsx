@@ -26,7 +26,6 @@ const Region = () => {
     name: '',
     page: 0,
     limit: 20,
-    sort: 'name',
   });
   const [getting, setGetting] = useState(true);
 

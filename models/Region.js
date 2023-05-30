@@ -5,6 +5,7 @@ const regionSchema = new Schema(
   {
     name: {
       type: String,
+      index: true,
       required: true,
       trim: true,
       minLength: [3, 'Terlalu pendek, setidaknya 3 karakter'],
@@ -12,7 +13,7 @@ const regionSchema = new Schema(
       match: [/^[a-zA-Z\s]*$/, 'Data tidak benar (hanya huruf)'],
       validate: {
         validator: async function (value) {
-          const _id = this.get('_id').toString();
+          const _id = this.get('_id');
           const count = await mongoose.models.Region.countDocuments({
             name: new RegExp(`^${value}$`, 'i'),
             _id: { $ne: _id },
@@ -26,18 +27,18 @@ const regionSchema = new Schema(
   {
     timestamps: {
       createdAt: 'created_at',
-      UpdatedAt: 'updated_at',
+      updatedAt: 'updated_at',
     },
   }
 );
 
 regionSchema.pre('deleteOne', async function (next) {
-  const memberDeleted = await mongoose.models.Member.find({
+  // delete member with this region
+  const memberDeleting = await mongoose.models.Member.find({
     region: this._conditions._id,
   }).exec();
-
-  for (const member of memberDeleted) {
-    await mongoose.models.Member.deleteOne({ _id: member._id.toString() }).exec();
+  for (const member of memberDeleting) {
+    await mongoose.models.Member.deleteOne({ _id: member._id }).exec();
   }
 
   next();

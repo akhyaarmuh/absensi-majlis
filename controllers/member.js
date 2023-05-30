@@ -24,26 +24,22 @@ export const createMember = async (req, res) => {
 
 export const getAllMember = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/images`;
-  const { page = 0, limit = 0, sort = '', ...query } = req.query;
+  const { page = 0, limit = 0, sort = 'region full_name', ...query } = req.query;
   const queries = {};
-  if (query.region) queries.region = query.region;
-  if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
   if (query.no_induk) queries.no_induk = query.no_induk;
-  if (query.absent)
-    queries.$or = [{ absent_dzikiran: query.absent }, { absent_kematian: query.absent }];
+  if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
+  if (query.region) queries.region = query.region;
 
   try {
-    let data = await Member.find(queries).exec();
-    const rows = data.length;
-    const allPage = Math.ceil(rows ? rows / (limit || rows) : 0);
+    const rows = await Member.countDocuments(queries);
+    const allPage = !rows ? 0 : !limit ? 1 : Math.ceil(rows / limit);
 
-    data = await Member.find(queries)
+    const data = await Member.find(queries)
       .select('-__v')
       .populate('region', 'name')
       .sort(sort)
       .skip(page * limit)
-      .limit(limit || rows)
-      .exec();
+      .limit(limit || rows);
 
     res.json({ data, page: Number(page), limit: Number(limit), rows, allPage, url });
   } catch (error) {
@@ -56,10 +52,7 @@ export const getMemberById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const data = await Member.findOne({ _id })
-      .select('-__v')
-      .populate('region', 'name')
-      .exec();
+    const data = await Member.findOne({ _id }).select('-__v').populate('region', 'name');
 
     const member = data;
     member.url = url;
@@ -81,7 +74,7 @@ export const updateMemberById = async (req, res) => {
       {
         runValidators: true,
       }
-    ).exec();
+    );
 
     res.json({ data: payload });
   } catch (error) {
@@ -98,9 +91,9 @@ export const updateStatusById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const member = await Member.findOne({ _id }).exec();
+    const member = await Member.findOne({ _id });
 
-    await Member.findOneAndUpdate({ _id }, { status: member.status ? 0 : 1 }).exec();
+    await Member.findOneAndUpdate({ _id }, { status: member.status ? 0 : 1 });
 
     res.sendStatus(204);
   } catch (error) {
@@ -121,13 +114,11 @@ export const updateAbsentById = async (req, res) => {
       { _id },
       {
         $set: {
-          attend_dzikiran: [],
-          attend_kematian: [],
-          absent_dzikiran: [],
+          attendance_dzikiran: [],
           absent_kematian: [],
         },
       }
-    ).exec();
+    );
 
     res.sendStatus(204);
   } catch (error) {
@@ -144,7 +135,7 @@ export const deleteMemberById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    await Member.deleteOne({ _id }).exec();
+    await Member.deleteOne({ _id });
 
     res.sendStatus(204);
   } catch (error) {
@@ -187,8 +178,8 @@ export const uploadImage = async (req, res) => {
     image.mv(`${__dirname}/public/images/${fileName}`, async (error) => {
       if (error) throw error;
 
-      const oldMember = await Member.findOne({ _id }).exec();
-      await Member.findOneAndUpdate({ _id }, { image: fileName }).exec();
+      const oldMember = await Member.findOne({ _id });
+      await Member.findOneAndUpdate({ _id }, { image: fileName });
 
       if (oldMember.image) fs.unlinkSync(`${__dirname}/public/images/${oldMember.image}`);
     });
@@ -208,11 +199,11 @@ export const deleteImage = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const member = await Member.findOne({ _id }).exec();
+    const member = await Member.findOne({ _id });
 
     if (member.image) fs.unlinkSync(`${__dirname}/public/images/${member.image}`);
 
-    await Member.findByIdAndUpdate({ _id }, { image: '' }).exec();
+    await Member.findByIdAndUpdate({ _id }, { image: '' });
 
     res.sendStatus(204);
   } catch (error) {

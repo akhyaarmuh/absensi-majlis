@@ -10,6 +10,7 @@ const memberSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
       match: [/^\d+$/, 'No induk tidak benar (hanya nomor)'],
       validate: {
         validator: async function (value) {
@@ -18,6 +19,7 @@ const memberSchema = new Schema(
             no_induk: new RegExp(`^${value}$`, 'i'),
             _id: { $ne: _id },
           });
+
           return !count;
         },
         message: 'No induk sudah digunakan',
@@ -27,7 +29,6 @@ const memberSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      index: true,
       minLength: [3, 'Terlalu pendek, setidaknya 3 karakter'],
       maxLength: [25, 'Panjang maksimal 25 karakter'],
       match: [/^[a-zA-Z\s]*$/, 'Masukan nama yang benar (hanya huruf)'],
@@ -52,64 +53,89 @@ const memberSchema = new Schema(
     region: {
       type: ObjectId,
       required: true,
-      index: true,
       ref: 'Region',
     },
     status: {
       type: Number,
+      required: true,
       default: 0,
     },
     image: {
       type: String,
       trim: true,
     },
-    attend_dzikiran: [
+    attendance_dzikiran: [
       {
-        type: ObjectId,
-        index: true,
+        event_id: {
+          type: ObjectId,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
       },
-    ],
-    attend_kematian: [
-      {
-        type: ObjectId,
-        index: true,
-      },
-    ],
-    absent_dzikiran: [
-      {
-        type: ObjectId,
-        index: true,
-      },
+      { _id: false },
     ],
     absent_kematian: [
       {
-        type: ObjectId,
-        index: true,
+        event_id: {
+          type: ObjectId,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
       },
+      { _id: false },
     ],
   },
   {
     timestamps: {
       createdAt: 'created_at',
-      UpdatedAt: 'updated_at',
+      updatedAt: 'updated_at',
     },
   }
 );
 
 memberSchema.pre('deleteOne', async function (next) {
-  const presentDeleted = await mongoose.models.PresentBook.find({
-    member: this._conditions._id,
-  }).exec();
-
-  for (const present of presentDeleted) {
-    await mongoose.models.PresentBook.deleteOne({ _id: present._id }).exec();
+  // delete member on attendance_book.member_id
+  const attendanceDeleting = await mongoose.models.Attendance_Book.find({
+    member_id: this._conditions._id,
+  });
+  for (const attendance of attendanceDeleting) {
+    await mongoose.models.Attendance_Book.deleteOne({ _id: attendance._id });
   }
 
+  // delete member on Event.absent
+  await mongoose.models.Event.updateMany(
+    {
+      absent: this._conditions._id,
+    },
+    {
+      $pullAll: {
+        absent: [this._conditions._id],
+      },
+    }
+  );
+
+  // delete member.image on server
   const deletingMember = await mongoose.models.Member.findOne(this._conditions);
   if (deletingMember.image)
     fs.unlinkSync(`${__dirname}/public/images/${deletingMember.image}`);
 
   next();
 });
+
+memberSchema.index({ full_name: 1, region: 1 });
 
 export default model('Member', memberSchema);

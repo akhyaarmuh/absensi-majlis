@@ -62,7 +62,7 @@ const Form = (props) => {
   const { type } = props;
   const breadList = [
     { title: 'Beranda', href: '/' },
-    { title: 'Anggota', href: '/member' },
+    { title: 'Anggota', href: -1 },
     { title: type === 'create' ? 'Buat' : 'Perbarui' },
   ];
   const location = useLocation();
@@ -117,7 +117,7 @@ const Form = (props) => {
     try {
       if (type === 'update') {
         await updateMemberById(payload);
-        navigate('/member');
+        navigate(-1);
       } else {
         const newMember = await createMember(payload);
         Swal.fire({

@@ -6,7 +6,7 @@ import { uploadImage, deleteImageById } from '../../fetchers/member';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
-  { title: 'Anggota', href: '/member' },
+  { title: 'Anggota', href: -2 },
   { title: 'Upload gambar' },
 ];
 
@@ -40,7 +40,7 @@ const UploadImage = () => {
       await uploadImage(location.state._id, formData);
 
       if (location.state.from === 'create') navigate('/member/create');
-      else navigate('/member');
+      else navigate(-2);
     } catch (error) {
       if (error.response.status === 400)
         setErrorMessage({ ...errorMessage, ...error.response.data.error });

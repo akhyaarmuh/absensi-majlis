@@ -5,9 +5,7 @@ import { useState, useEffect } from 'react';
 import { AiOutlineFilePdf } from 'react-icons/ai';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
-import { getAllMember } from '../../fetchers/member';
 import { Breadcrumbs, Button } from '../../components';
-import { getAllPresentByEvent } from '../../fetchers/present-book';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
@@ -15,27 +13,38 @@ const breadList = [
   { title: 'Anggota tidak hadir' },
 ];
 
+const filtering = (members, queries) => {
+  let filtered = members;
+
+  if (queries.no_induk) {
+    const singleData = filtered.find((member) => member.no_induk === queries.no_induk);
+    filtered = singleData ? [singleData] : [];
+  }
+
+  if (queries.full_name)
+    filtered = filtered.filter((member) =>
+      member.full_name.toLowerCase().includes(queries.full_name)
+    );
+
+  if (queries.region)
+    filtered = filtered.filter((member) => member.region._id === queries.region);
+
+  return filtered;
+};
+
 const Detail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const regions = useSelector((state) => state.region.data);
-  const [getting, setGetting] = useState(true);
-  const [attends, setAttends] = useState(0);
-  const [member, setMember] = useState({
-    data: [],
-    page: 0,
-    limit: 0,
-    rows: 0,
-    allPage: 0,
-  });
+  const attendance = location.state.attendance || 0;
+  const [members] = useState(location.state.absent || []);
+  const [allPage, setAllPage] = useState(0);
+  const [show, setShow] = useState([]);
   const [queries, setQueries] = useState({
-    region: '',
-    full_name: '',
     no_induk: '',
-    absent: location.state?._id,
+    full_name: '',
+    region: '',
     page: 0,
-    limit: 20,
-    sort: 'full_name',
   });
 
   useEffect(() => {
@@ -43,26 +52,14 @@ const Detail = () => {
   }, [location, navigate]);
 
   useEffect(() => {
-    const getAll = async () => {
-      setGetting(true);
-      try {
-        const absent = await getAllMember(queries);
-        const { rows } = await getAllPresentByEvent(queries.absent);
-        setMember(absent);
-        setAttends(rows);
-      } catch (error) {
-        console.log(error);
-      }
+    const filtered = filtering(members, queries);
+    console.log(filtered);
 
-      setGetting(false);
-    };
-
-    getAll();
-  }, [queries]);
+    setAllPage(Math.ceil(filtered.length / 20));
+    setShow(filtered.slice(queries.page * 20, queries.page * 20 + 20));
+  }, [queries, members]);
 
   const changeInputQueries = (e) => {
-    if (getting) return;
-
     const name = e.target.name;
     const value = e.target.value;
 
@@ -71,12 +68,14 @@ const Detail = () => {
   };
 
   const handlePrintPDF = async () => {
-    const { data } = await getAllMember({
-      absent: location.state._id,
-      region: queries.region,
-      sort: 'region full_name',
-    });
-    navigate(`/event/${location.state._id}/pdf-preview`, { state: data });
+    // const { data } = await getAllMember({
+    //   absent: location.state._id,
+    //   region: queries.region,
+    //   sort: 'region full_name',
+    // });
+    const filtered = filtering(members, queries);
+
+    navigate(`/event/${location.state._id}/pdf-preview`, { state: filtered });
   };
 
   return (
@@ -141,7 +140,7 @@ const Detail = () => {
           </thead>
 
           <tbody>
-            {member.data.map((member, i) => (
+            {show.map((member, i) => (
               <tr
                 className={
                   i % 2 === 1 ? 'border-y' : 'border-y bg-neutral-100 dark:bg-transparent'
@@ -159,34 +158,32 @@ const Detail = () => {
       </div>
 
       {/* pagination */}
-      <p>Total hadir: {attends}</p>
-      <p>Total data: {member.rows}</p>
+      <p>Total tidak hadir: {members.length}</p>
+      <p>Total hadir: {attendance}</p>
 
-      {member.rows > 0 && (
+      {show.length > 0 && (
         <>
           <p>
-            Halaman : {member.page + 1} dari {member.allPage} halaman.
+            Halaman : {queries.page + 1} dari {allPage} halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">
-            {member.page > 0 && (
+            {queries.page > 0 && (
               <Button
                 label="Sebelumnya"
                 icon={<BsArrowLeftShort className="text-xl" />}
                 outline
-                disabled={getting}
-                onClick={() => setQueries({ ...queries, page: member.page - 1 })}
+                onClick={() => setQueries({ ...queries, page: queries.page - 1 })}
               />
             )}
 
-            {member.page < member.allPage - 1 && (
+            {queries.page < allPage - 1 && (
               <Button
                 label="Selanjutnya"
                 icon={<BsArrowRightShort className="text-xl" />}
                 reverse
                 outline
-                disabled={getting}
-                onClick={() => setQueries({ ...queries, page: member.page + 1 })}
+                onClick={() => setQueries({ ...queries, page: queries.page + 1 })}
               />
             )}
           </div>

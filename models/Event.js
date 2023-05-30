@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const { Schema, model } = mongoose;
+const { Schema, model, ObjectId } = mongoose;
 
 const eventSchema = new Schema(
   {
@@ -22,13 +22,26 @@ const eventSchema = new Schema(
     },
     status: {
       type: Number,
+      required: true,
       default: 1,
     },
+    attendance: {
+      type: Number,
+      default: 0,
+    },
+    absent: [
+      {
+        type: ObjectId,
+        required: true,
+        ref: 'Member',
+      },
+    ],
+    expire_at: { type: Date, default: Date.now, expires: 86400 * 360 },
   },
   {
     timestamps: {
       createdAt: 'created_at',
-      UpdatedAt: 'updated_at',
+      updatedAt: 'updated_at',
     },
   }
 );
@@ -41,32 +54,30 @@ eventSchema.pre('save', async function (next) {
 });
 
 eventSchema.pre('deleteOne', async function (next) {
-  const presentDeleted = await mongoose.models.PresentBook.find({
-    event: this._conditions._id,
-  }).exec();
-
-  for (const present of presentDeleted) {
-    await mongoose.models.PresentBook.deleteOne({ _id: present._id }).exec();
+  // delete event on attendance_book.event_id
+  const attendanceDeleting = await mongoose.models.Attendance_Book.find({
+    event_id: this._conditions._id,
+  });
+  for (const attendance of attendanceDeleting) {
+    await mongoose.models.Attendance_Book.deleteOne({ _id: attendance._id });
   }
 
+  // delete event on Member.attendance_dzikiran[{event_id}] & Member.absent_kematian[{event_id}]
   await mongoose.models.Member.updateMany(
     {
       $or: [
-        { attend_dzikiran: this._conditions._id },
-        { attend_kematian: this._conditions._id },
-        { absent_dzikiran: this._conditions._id },
-        { absent_kematian: this._conditions._id },
+        { 'attendance_dzikiran.event_id': this._conditions._id },
+        { 'absent_kematian.event_id': this._conditions._id },
       ],
     },
     {
-      $pullAll: {
-        attend_dzikiran: [this._conditions._id],
-        attend_kematian: [this._conditions._id],
-        absent_dzikiran: [this._conditions._id],
-        absent_kematian: [this._conditions._id],
+      $pull: {
+        attendance_dzikiran: { event_id: this._conditions._id },
+        absent_kematian: { event_id: this._conditions._id },
       },
-    }
-  ).exec();
+    },
+    { safe: true, multi: true }
+  );
 
   next();
 });

@@ -23,4 +23,4 @@
 /node_modules
 /public
 .env
-majlis.json
+backup.json

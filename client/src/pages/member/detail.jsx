@@ -10,7 +10,7 @@ import { updateStatusById, resetAbsentById } from '../../fetchers/member';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
-  { title: 'Anggota', href: '/member' },
+  { title: 'Anggota', href: -1 },
   { title: 'Detail Member' },
 ];
 const displayBirth = (date) => {
@@ -26,7 +26,7 @@ const Detail = () => {
   const [member, setMember] = useState({
     status: 0,
     image: '',
-    attend_dzikiran: [],
+    attendance_dzikiran: [],
     absent_kematian: [],
   });
 
@@ -98,9 +98,7 @@ const Detail = () => {
       if (res.isConfirmed) {
         setMember({
           ...member,
-          attend_dzikiran: [],
-          attend_kematian: [],
-          absent_dzikiran: [],
+          attendance_dzikiran: [],
           absent_kematian: [],
         });
 
@@ -182,10 +180,17 @@ const Detail = () => {
 
       {(!member.status || member.absent_kematian.length >= 3) && (
         <p className="mt-3">
-          Hadir Dzikiran : {member.attend_dzikiran.length} kali berturut-turut
+          Hadir Dzikiran : {member.attendance_dzikiran.length} kali berturut-turut
         </p>
       )}
       <p className="mt-3">Absen Kematian : {member.absent_kematian.length} kali</p>
+      <ul>
+        {member.absent_kematian.map((event) => (
+          <li>
+            {event.name} - {event.date}
+          </li>
+        ))}
+      </ul>
       <Button label="Set Ulang Absen" type="danger" outline onClick={resetAbsent} />
     </>
   );

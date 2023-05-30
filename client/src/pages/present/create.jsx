@@ -24,6 +24,7 @@ const displayBirth = (date) => {
 const Create = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [count, setCount] = useState(0);
   const [event, setEvent] = useState({});
   const [member, setMember] = useState({});
 
@@ -39,10 +40,11 @@ const Create = () => {
       try {
         const member = await createPresent({
           no_induk: value,
-          event: event._id,
+          event_id: event._id,
           type: event.type,
         });
         setMember(member);
+        setCount(count + 1);
       } catch (error) {
         playError();
         Swal.fire({
@@ -71,6 +73,8 @@ const Create = () => {
           ? `kifayah ${event.name}`
           : `dzikiran di ${event.name}`}
       </h3>
+
+      <h5 className="text-md">Count test: {count}</h5>
 
       <input
         className="my-5 w-full appearance-none rounded border py-2 px-3 text-sm leading-tight text-gray-700 shadow focus:outline-none dark:border-[#4B5563] dark:bg-charcoal dark:text-white tablet:w-[300px]"

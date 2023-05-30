@@ -4,8 +4,8 @@ import User from '../models/User.js';
 import Region from '../models/Region.js';
 import Member from '../models/Member.js';
 import Event from '../models/Event.js';
+import Attendance_Book from '../models/Attendance_Book.js';
 import { __dirname } from '../utilities/index.js';
-import PresentBook from '../models/PresentBook.js';
 import { restoreDatabase, formatterErrorValidation } from '../utilities/mongoose.js';
 
 export const restore = async (req, res) => {
@@ -29,7 +29,7 @@ export const restore = async (req, res) => {
         errors: { file: { message: 'File yang diizinkan (.json)' } },
       };
 
-    const fileName = 'majlis' + ext;
+    const fileName = 'backup' + ext;
 
     backup.mv(`${__dirname}/${fileName}`, async (error) => {
       if (error) throw error;
@@ -38,7 +38,7 @@ export const restore = async (req, res) => {
       await Region.collection.drop();
       await Member.collection.drop();
       await Event.collection.drop();
-      await PresentBook.collection.drop();
+      await Attendance_Book.collection.drop();
 
       await restoreDatabase();
     });

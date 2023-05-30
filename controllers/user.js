@@ -20,21 +20,18 @@ export const createUser = async (req, res) => {
 
 // get all user
 export const getAllUser = async (req, res) => {
-  const { page = 0, limit = 0, sort = '' } = req.query;
+  const { page = 0, limit = 0, sort = 'role full_name' } = req.query;
   const queries = {};
 
   try {
-    let data = await User.find(queries).exec();
-    const rows = data.length;
-    const allPage = Math.ceil(rows ? rows / (limit || rows) : 0);
+    const rows = await User.countDocuments(queries);
+    const allPage = !rows ? 0 : !limit ? 1 : Math.ceil(rows / limit);
 
-    data = await User.find(queries)
+    const data = await User.find(queries)
       .select('-password -refresh_token -__v')
       .sort(sort)
       .skip(page * limit)
-      .limit(limit || rows)
-      .exec();
-
+      .limit(limit || rows);
     res.json({ data, page: Number(page), limit: Number(limit), rows, allPage });
   } catch (error) {
     res.status(500).json({ message: error.message, error });
@@ -46,7 +43,7 @@ export const getUserById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const data = await User.findOne({ _id }, '-password -refresh_token -__v').exec();
+    const data = await User.findOne({ _id }, '-password -refresh_token -__v');
     res.json({ data });
   } catch (error) {
     res.status(500).json({ message: error.message, error });
@@ -65,7 +62,7 @@ export const updateUserById = async (req, res) => {
       {
         runValidators: true,
       }
-    ).exec();
+    );
 
     res.json({ data: payload });
   } catch (error) {
@@ -83,7 +80,7 @@ export const updatePasswordById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const user = await User.findOne({ _id }).exec();
+    const user = await User.findOne({ _id });
 
     user.set('password', req.body.password);
     await user.save();
@@ -104,9 +101,9 @@ export const updateStatusdById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const user = await User.findOne({ _id }).exec();
+    const user = await User.findOne({ _id });
 
-    await User.findOneAndUpdate({ _id }, { status: user.status ? 0 : 1 }).exec();
+    await User.findOneAndUpdate({ _id }, { status: user.status ? 0 : 1 });
 
     res.sendStatus(204);
   } catch (error) {
@@ -119,7 +116,7 @@ export const deleteUserById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    await User.deleteOne({ _id }).exec();
+    await User.deleteOne({ _id });
     res.sendStatus(204);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error', error });

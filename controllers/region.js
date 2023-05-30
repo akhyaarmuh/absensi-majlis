@@ -18,22 +18,19 @@ export const createRegion = async (req, res) => {
 };
 
 export const getAllRegion = async (req, res) => {
-  const { page = 0, limit = 0, sort = '', ...query } = req.query;
+  const { page = 0, limit = 0, sort = 'name', ...query } = req.query;
   const queries = {};
   if (query.name) queries.name = new RegExp(query.name, 'i');
 
   try {
-    let data = await Region.find(queries).exec();
-    const rows = data.length;
-    const allPage = Math.ceil(rows ? rows / (limit || rows) : 0);
+    const rows = await Region.countDocuments(queries);
+    const allPage = !rows ? 0 : !limit ? 1 : Math.ceil(rows / limit);
 
-    data = await Region.find(queries)
+    const data = await Region.find(queries)
       .select('-__v')
       .sort(sort)
       .skip(page * limit)
-      .limit(limit || rows)
-      .exec();
-
+      .limit(limit || rows);
     res.json({ data, page: Number(page), limit: Number(limit), rows, allPage });
   } catch (error) {
     res.status(500).json({ message: error.message, error });
@@ -44,7 +41,7 @@ export const getRegionById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    const data = await Region.findOne({ _id }).select('-__v').exec();
+    const data = await Region.findOne({ _id }).select('-__v');
 
     res.json({ data });
   } catch (error) {
@@ -63,7 +60,7 @@ export const updateRegionById = async (req, res) => {
       {
         runValidators: true,
       }
-    ).exec();
+    );
 
     res.json({ data: payload });
   } catch (error) {
@@ -80,7 +77,7 @@ export const deleteRegionById = async (req, res) => {
   const { id: _id } = req.params;
 
   try {
-    await Region.deleteOne({ _id }).exec();
+    await Region.deleteOne({ _id });
 
     res.sendStatus(204);
   } catch (error) {
