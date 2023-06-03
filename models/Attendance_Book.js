@@ -12,20 +12,8 @@ const attendanceBookSchema = new Schema(
       type: ObjectId,
       required: true,
       ref: 'Member',
-      // validate: {
-      //   validator: async function (value) {
-      //     // const _id = this.get('_id').toString();
-      //     const event = this.get('event').toString();
-      //     const count = await mongoose.models.PresentBook.countDocuments({
-      //       event,
-      //       member: value,
-      //       // _id: { $ne: _id },
-      //     });
-      //     return !count;
-      //   },
-      //   message: 'Anggota sudah berhasil absen',
-      // },
     },
+    expire_at: { type: Date, default: Date.now, expires: 86400 * 7 },
   },
   {
     timestamps: {
