@@ -26,6 +26,7 @@ const Member = () => {
   const [queries, setQueries] = useState({
     no_induk: params.get('no_induk') || '',
     full_name: params.get('full_name') || '',
+    status: params.get('status') || '',
     region: params.get('region') || '',
     page: params.get('page') || 0,
     limit: 20,
@@ -148,7 +149,30 @@ const Member = () => {
                 />
               </th>
 
-              <th></th>
+              <th>
+                <Select
+                  className="my-react-select-container"
+                  classNamePrefix="my-react-select"
+                  menuPosition="fixed"
+                  placeholder="Status..."
+                  name="status"
+                  isClearable
+                  options={[
+                    { value: 'new', label: 'Baru' },
+                    { value: 'inactive', label: 'Tidak aktif' },
+                  ]}
+                  defaultValue={
+                    !queries.status
+                      ? []
+                      : queries.status === 'new'
+                      ? { value: 'new', label: 'Baru' }
+                      : { value: 'inactive', label: 'Tidak aktif' }
+                  }
+                  onChange={(e) =>
+                    setQueries({ ...queries, status: e?.value || '', page: 0 })
+                  }
+                />
+              </th>
               <th className="min-w-[190px] pr-4">
                 <Select
                   className="my-react-select-container"

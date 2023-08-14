@@ -29,6 +29,14 @@ export const getAllMember = async (req, res) => {
   if (query.no_induk) queries.no_induk = query.no_induk;
   if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
   if (query.region) queries.region = query.region;
+  if (query.status) {
+    if (query.status === 'new') queries.status = 0;
+    else if (query.status === 'inactive')
+      queries.$or = [
+        { absent_dzikiran: { $size: 3 } },
+        { absent_kematian: { $size: 3 } },
+      ];
+  }
 
   try {
     const rows = await Member.countDocuments(queries);
