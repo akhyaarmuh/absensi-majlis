@@ -103,7 +103,7 @@ const Detail = () => {
             attendance_dzikiran: [],
             absent_kematian: [],
           });
-        } else {
+        } else if (type === 'dzikiran') {
           setMember({
             ...member,
             attendance_dzikiran: [],

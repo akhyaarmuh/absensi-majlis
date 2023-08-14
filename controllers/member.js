@@ -108,7 +108,7 @@ export const updateStatusById = async (req, res) => {
 
 export const updateAbsentById = async (req, res) => {
   const { id: _id } = req.params;
-  const { type } = req.body.type;
+  const { type } = req.body;
 
   try {
     if (type === 'kematian') {
@@ -121,7 +121,7 @@ export const updateAbsentById = async (req, res) => {
           },
         }
       );
-    } else {
+    } else if (type === 'dzikiran') {
       await Member.findOneAndUpdate(
         { _id },
         {
