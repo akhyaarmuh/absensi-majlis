@@ -27,8 +27,8 @@ export const updateStatusById = async (id) => {
   await axiosWT.patch(`${rootPath}/${id}/status`);
 };
 
-export const resetAbsentById = async (id) => {
-  await axiosWT.patch(`${rootPath}/${id}/absent`);
+export const resetAbsentById = async (id, payload) => {
+  await axiosWT.patch(`${rootPath}/${id}/absent`, payload);
 };
 
 export const deleteMemberById = async (id) => {

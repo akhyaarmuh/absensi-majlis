@@ -108,17 +108,30 @@ export const updateStatusById = async (req, res) => {
 
 export const updateAbsentById = async (req, res) => {
   const { id: _id } = req.params;
+  const { type } = req.body.type;
 
   try {
-    await Member.findOneAndUpdate(
-      { _id },
-      {
-        $set: {
-          attendance_dzikiran: [],
-          absent_kematian: [],
-        },
-      }
-    );
+    if (type === 'kematian') {
+      await Member.findOneAndUpdate(
+        { _id },
+        {
+          $set: {
+            attendance_dzikiran: [],
+            absent_kematian: [],
+          },
+        }
+      );
+    } else {
+      await Member.findOneAndUpdate(
+        { _id },
+        {
+          $set: {
+            attendance_dzikiran: [],
+            absent_dzikiran: [],
+          },
+        }
+      );
+    }
 
     res.sendStatus(204);
   } catch (error) {

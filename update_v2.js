@@ -1,60 +1,47 @@
-import { Schema, model } from 'mongoose';
 import 'dotenv/config';
 import './config/database.js';
-import User from './models/User.js';
-import Region from './models/Region.js';
 import Member from './models/Member.js';
 import Event from './models/Event.js';
-const PresentBookSchema = new Schema({});
-const PresentBook = model('PresentBook', PresentBookSchema);
 
-// simpan semua data
-const users = await User.find();
-const regions = await Region.find();
-const members = await Member.find();
+const [lastEvent, secondEvent, thirdEvent] = await Event.find({ type: 'kematian' })
+  .select('_id')
+  .sort('-created_at');
 
-// drop semua collection
-await User.collection.drop();
-await Region.collection.drop();
-await Member.collection.drop();
-await Event.collection.drop();
-await PresentBook.collection.drop();
+// perbaiki yang absen kematian 1, 2, 3 kali bukan event terakhir
+await Member.updateMany(
+  {
+    $where: 'this.absent_kematian.length>0',
+    'absent_kematian.event_id': { $ne: lastEvent._id },
+  },
+  {
+    $set: { absent_kematian: [] },
+  }
+);
 
-// masukkan ulang semua data
+// perbaiki yang absen kematian 2 kali, dan tidak bertururt-turut
+await Member.updateMany(
+  {
+    absent_kematian: { $size: 2 },
+    'absent_kematian.event_id': { $ne: secondEvent._id },
+  },
+  {
+    $set: { absent_kematian: [] },
+  }
+);
 
-// users
-for (const user of users) {
-  const newUser = new User({
-    ...user._doc,
-    __v: 2,
-  });
-  await newUser.save({ validateBeforeSave: false });
-}
+// perbaiki yang absen kematian 3 kali, dan tidak bertururt-turut
+await Member.updateMany(
+  {
+    absent_kematian: { $size: 3 },
+    $or: [
+      { 'absent_kematian.event_id': { $ne: secondEvent._id } },
+      { 'absent_kematian.event_id': { $ne: thirdEvent._id } },
+    ],
+  },
+  {
+    $set: { absent_kematian: [] },
+  }
+);
 
-// regions
-for (const region of regions) {
-  const newRegion = new Region({
-    ...region._doc,
-    __v: 2,
-  });
-  await newRegion.save({ validateBeforeSave: false });
-}
-
-// members
-for (const member of members) {
-  const newMember = new Member({
-    _id: member._id,
-    no_induk: member.no_induk,
-    full_name: member.full_name,
-    parent_name: member.parent_name,
-    birth: member.birth,
-    region: member.region,
-    address: member.address,
-    status: 1,
-    image: member.image,
-    __v: 2,
-  });
-  await newMember.save({ validateBeforeSave: false });
-}
-
+// selesai
 console.log('Berhasil');

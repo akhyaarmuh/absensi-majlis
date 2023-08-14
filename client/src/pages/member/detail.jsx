@@ -28,6 +28,7 @@ const Detail = () => {
     image: '',
     attendance_dzikiran: [],
     absent_kematian: [],
+    absent_dzikiran: [],
   });
 
   useEffect(() => {
@@ -73,9 +74,9 @@ const Detail = () => {
     });
   };
 
-  const resetAbsent = async () => {
+  const resetAbsent = async (type) => {
     Swal.fire({
-      title: `Set ulang absensi ${member.full_name}?`,
+      title: `Set ulang absensi ${type} ${member.full_name}?`,
       text: 'Anda yakin',
       icon: 'question',
       confirmButtonText: 'Ya, set ulang!',
@@ -88,7 +89,7 @@ const Detail = () => {
       preConfirm: () => {
         return (async () => {
           try {
-            await resetAbsentById(member._id);
+            await resetAbsentById(member._id, { type });
           } catch (error) {
             Swal.showValidationMessage(error.response?.data?.message || error.message);
           }
@@ -96,11 +97,19 @@ const Detail = () => {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        setMember({
-          ...member,
-          attendance_dzikiran: [],
-          absent_kematian: [],
-        });
+        if (type === 'kematian') {
+          setMember({
+            ...member,
+            attendance_dzikiran: [],
+            absent_kematian: [],
+          });
+        } else {
+          setMember({
+            ...member,
+            attendance_dzikiran: [],
+            absent_dzikiran: [],
+          });
+        }
 
         Swal.fire({
           icon: 'success',
@@ -169,7 +178,7 @@ const Detail = () => {
         Status :{' '}
         {!member.status ? (
           <Badges label="Baru" />
-        ) : member.absent_kematian.length > 2 ? (
+        ) : member.absent_kematian.length > 2 || member.absent_dzikiran.length > 2 ? (
           <Badges label="Tidak Aktif" type="warning" />
         ) : (
           <Badges label="Aktif" type="success" />
@@ -178,20 +187,46 @@ const Detail = () => {
       <div className="h-1"></div>
       <Button label="Perbarui Status" outline onClick={updateStatus} />
 
-      {(!member.status || member.absent_kematian.length >= 3) && (
+      {(!member.status ||
+        member.absent_kematian.length >= 3 ||
+        member.absent_dzikiran.length >= 3) && (
         <p className="mt-3">
           Hadir Dzikiran : {member.attendance_dzikiran.length} kali berturut-turut
         </p>
       )}
-      <p className="mt-3">Absen Kematian : {member.absent_kematian.length} kali</p>
+      <p className="mt-3">
+        Absen Kematian : {member.absent_kematian.length} kali berturut-turut
+      </p>
       <ul>
         {member.absent_kematian.map((event) => (
           <li>
-            {event.name} - {event.date}
+            {event.name} - {displayBirth(event.date)}
           </li>
         ))}
       </ul>
-      <Button label="Set Ulang Absen" type="danger" outline onClick={resetAbsent} />
+      <Button
+        label="Set Ulang Absen Kematian"
+        type="danger"
+        outline
+        onClick={() => resetAbsent('kematian')}
+      />
+
+      <p className="mt-3">
+        Absen Dzikiran : {member.absent_dzikiran.length} kali berturut-turut
+      </p>
+      <ul>
+        {member.absent_dzikiran.map((event) => (
+          <li>
+            {event.name} - {displayBirth(event.date)}
+          </li>
+        ))}
+      </ul>
+      <Button
+        label="Set Ulang Absen Dzikiran"
+        type="danger"
+        outline
+        onClick={() => resetAbsent('dzikiran')}
+      />
     </>
   );
 };

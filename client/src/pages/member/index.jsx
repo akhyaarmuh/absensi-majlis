@@ -200,7 +200,8 @@ const Member = () => {
                 <td className="whitespace-nowrap px-6">
                   {!member.status ? (
                     <Badges label="Baru" />
-                  ) : member.absent_kematian.length > 2 ? (
+                  ) : member.absent_kematian.length > 2 ||
+                    member.absent_dzikiran.length > 2 ? (
                     <Badges label="Tidak Aktif" type="warning" />
                   ) : (
                     <Badges label="Aktif" type="success" />

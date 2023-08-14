@@ -18,7 +18,9 @@ export const createPresent = async (req, res) => {
 
     if (
       type === 'kematian' &&
-      (member.absent_kematian.length >= 3 || member.status === 0)
+      (member.absent_kematian.length >= 3 ||
+        member.absent_dzikiran.length >= 3 ||
+        member.status === 0)
     ) {
       throw {
         name: 'ValidationError',

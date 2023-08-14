@@ -98,6 +98,23 @@ const memberSchema = new Schema(
       },
       { _id: false },
     ],
+    absent_dzikiran: [
+      {
+        event_id: {
+          type: ObjectId,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        date: {
+          type: Date,
+          required: true,
+        },
+      },
+      { _id: false },
+    ],
   },
   {
     timestamps: {

@@ -62,18 +62,20 @@ eventSchema.pre('deleteOne', async function (next) {
     await mongoose.models.Attendance_Book.deleteOne({ _id: attendance._id });
   }
 
-  // delete event on Member.attendance_dzikiran[{event_id}] & Member.absent_kematian[{event_id}]
+  // delete event on Member.attendance_dzikiran[{event_id}], Member.absent_kematian[{event_id}] & Member.absent_dzikiran[{event_id}]
   await mongoose.models.Member.updateMany(
     {
       $or: [
         { 'attendance_dzikiran.event_id': this._conditions._id },
         { 'absent_kematian.event_id': this._conditions._id },
+        { 'absent_dzikiran.event_id': this._conditions._id },
       ],
     },
     {
       $pull: {
         attendance_dzikiran: { event_id: this._conditions._id },
         absent_kematian: { event_id: this._conditions._id },
+        absent_dzikiran: { event_id: this._conditions._id },
       },
     },
     { safe: true, multi: true }

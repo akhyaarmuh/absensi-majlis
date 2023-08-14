@@ -95,24 +95,32 @@ export const updateEventById = async (req, res) => {
 export const updateStatusById = async (req, res) => {
   const { id: _id } = req.params;
 
-  try {
-    const event = await Event.findOneAndUpdate({ _id }, { status: 0 });
+  let absentMembers;
+  const absent_ids = [];
+  const attendance_ids = [];
 
+  try {
+    // ambil event
+    const event = await Event.findOne({ _id });
+
+    // ambil semua anggota yang hadir
     const attendanceMembers = await Attendance_Book.find({ event_id: _id });
 
-    const attendance_ids = [];
+    // masukkan semua ID member yang hadir ke attendance_ids
     for (const member of attendanceMembers) {
       attendance_ids.push(member.member_id);
     }
 
-    let absentMembers;
-
     if (event.type === 'dzikiran') {
-      // masukan absen hadir ke member yang belum aktif atau absen kematian 3 kali
+      // masukan data hadir ke member yang belum aktif, absen kematian >= 3 kali atau absen dzikiran >= 3 kali
       await Member.updateMany(
         {
           _id: { $in: attendance_ids },
-          $or: [{ status: 0 }, { $where: 'this.absent_kematian.length>2' }],
+          $or: [
+            { status: 0 },
+            { $where: 'this.absent_kematian.length>2' },
+            { $where: 'this.absent_dzikiran.length>2' },
+          ],
         },
         {
           $push: {
@@ -125,25 +133,62 @@ export const updateStatusById = async (req, res) => {
         }
       );
 
-      // untuk yang tidak hadir dalam keadaan status belum aktif atau absen kematian lebih 3 kali maka reset attandance_dzikiran
+      // bagi yang hadir dalam keadaan absent_dzikiran kurang 3 kali maka reset absent_dzikiran
+      await Member.updateMany(
+        {
+          _id: { $in: attendance_ids },
+          $where: 'this.absent_dzikiran.length<3',
+        },
+        {
+          $set: { absent_dzikiran: [] },
+        }
+      );
+
+      // bagi yang tidak hadir dalam keadaan status belum aktif, absen kematian lebih 3 kali atau absen dzikiran lebih 3 kali maka reset attandance_dzikiran
       await Member.updateMany(
         {
           _id: { $nin: attendance_ids },
-          $or: [{ status: 0 }, { $where: 'this.absent_kematian.length>2' }],
+          $or: [
+            { status: 0 },
+            { $where: 'this.absent_kematian.length>2' },
+            { $where: 'this.absent_dzikiran.length>2' },
+          ],
         },
         { $set: { attendance_dzikiran: [] } }
       );
 
+      // masukan absen ke member yang tidak hadir dzikiran dibawah 3 kali
+      await Member.updateMany(
+        {
+          _id: { $nin: attendance_ids },
+          status: 1,
+          $where: 'this.absent_dzikiran.length<3',
+        },
+        {
+          $push: {
+            absent_dzikiran: {
+              event_id: _id,
+              name: event.name,
+              date: event.created_at,
+            },
+          },
+        }
+      );
+
       absentMembers = await Member.find({ _id: { $nin: attendance_ids } });
     } else if (event.type === 'kematian') {
-      // ambil siapa saja yang tidak hadir
-      absentMembers = await Member.find({
-        _id: { $nin: attendance_ids },
-        status: 1,
-        $where: 'this.absent_kematian.length<3',
-      });
+      // bagi yang hadir dalam keadaan absent_kematian kurang 3 kali maka reset absent_dzikiran
+      await Member.updateMany(
+        {
+          _id: { $in: attendance_ids },
+          $where: 'this.absent_kematian.length<3',
+        },
+        {
+          $set: { absent_kematian: [] },
+        }
+      );
 
-      // masukan absen ke member yang aktif atau absen kematian dibawah 3 kali
+      // masukan absen ke member yang tidak hadir kematian dibawah 3 kali
       await Member.updateMany(
         {
           _id: { $nin: attendance_ids },
@@ -160,16 +205,22 @@ export const updateStatusById = async (req, res) => {
           },
         }
       );
+
+      absentMembers = await Member.find({
+        _id: { $nin: attendance_ids },
+        status: 1,
+        $where: 'this.absent_kematian.length<3',
+        $where: 'this.absent_dzikiran.length<3',
+      });
     }
 
-    const absent_ids = [];
     for (const member of absentMembers) {
       absent_ids.push(member._id);
     }
 
     await Event.findOneAndUpdate(
       { _id },
-      { attendance: attendance_ids.length, absent: absent_ids }
+      { attendance: attendance_ids.length, absent: absent_ids, status: 0 }
     );
 
     for (const attandance of attendanceMembers) {
