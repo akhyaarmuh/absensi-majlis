@@ -210,7 +210,7 @@ export const updateStatusById = async (req, res) => {
         _id: { $nin: attendance_ids },
         status: 1,
         $where: 'this.absent_kematian.length<3',
-        // $where: 'this.absent_dzikiran.length<3',
+        $where: 'this.absent_dzikiran.length<3',
       });
     }
 
