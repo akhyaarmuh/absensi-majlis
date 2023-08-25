@@ -144,7 +144,7 @@ export const updateStatusById = async (req, res) => {
         }
       );
 
-      // bagi yang tidak hadir dalam keadaan status belum aktif, absen kematian lebih 3 kali atau absen dzikiran lebih 3 kali maka reset attandance_dzikiran
+      // bagi yang tidak hadir dalam keadaan status belum aktif, absen kematian lebih 2 kali atau absen dzikiran lebih 2 kali maka reset attandance_dzikiran
       await Member.updateMany(
         {
           _id: { $nin: attendance_ids },
@@ -177,7 +177,7 @@ export const updateStatusById = async (req, res) => {
 
       absentMembers = await Member.find({ _id: { $nin: attendance_ids } });
     } else if (event.type === 'kematian') {
-      // bagi yang hadir dalam keadaan absent_kematian kurang 3 kali maka reset absent_dzikiran
+      // bagi yang hadir dalam keadaan absent_kematian kurang 3 kali maka reset absent_kematian
       await Member.updateMany(
         {
           _id: { $in: attendance_ids },
